@@ -84,16 +84,13 @@ public:
 		}
 
 		if (n == maxelements) {
-			cout << "Error no more elements" << endl;
+			return;
 		}
-
-		cout << t << "  Not Returning  1  "  <<  i << endl;
 
 		for (j = n; j >= i; j--) {
 			x[j+1] = x[j];
  		}
 
-		cout << t << "  Stored  1  "  <<  i << endl;
 		x[i] = t;
 		n++;
 	}
@@ -125,7 +122,7 @@ void gen_array(int m, int maxval)
 
 	}
 
-	cout << "Final Printing " << v << " size ";
+	cout << "Final Printing " << v << " size " << S.size() << endl;
 	S.report(v);
 	for (int i = 0; i < m; i++) {
 		cout << v[i] << "\t";
@@ -135,21 +132,80 @@ void gen_array(int m, int maxval)
 }
 
 
-class IntSetLIST {
+
+class IntSetList {
 private:
-	set<int>	S;
+	int n, maxelements;
+	struct node {
+		int val;
+		node *next;
+		node(int v, node *p) { val = v; next = p; }
+	};
+	node *head, *sentinel;
+	node *rinsert(node *p, int t)
+	{
+		if (n == maxelements) return nullptr;
+
+		if (p->val < t) {
+			p->next = rinsert(p->next, t);
+		} else {
+			p = new node(t, p);
+			n++;
+		}
+		return p;
+	}
 public:
-	IntSetLIST(int maxelements, int maxval) { }
-	int size() { return S.size(); }
-	void insert(int t) { S.insert(t);}
+	IntSetList(int maxelements, int maxval)
+	{
+		n = 0;
+		this->maxelements = maxelements;
+		sentinel = head = new node(maxval, 0);
+	}
+
+	int size() { return n; }
+
+	void insert(int t)
+	{
+		head = rinsert(head, t);
+	}
+
 	void report(int *v)
 	{
 		int j = 0;
-		for (auto elem : S) {
-			v[j++] = elem;
+		for (node *p = head; p != sentinel; p = p->next) {
+			 v[j++] = p->val;
 		}
 	}
 };
+
+
+void gen_list(int m, int maxval)
+{
+	int *v = new int[m];
+
+	IntSetList S(m, maxval);
+
+	while (S.size() < m) {
+		int k = rand() % maxval;
+		cout << "Inserted " << k << " size ";
+		cout << S.size() << endl;
+		S.insert(k);
+		S.report(v);
+		for (int i = 0; i < m; i++) {
+			cout << v[i] << "\t";
+		}
+		cout<<endl;
+
+	}
+
+	cout << "Final Printing " << v << " size " << S.size() << endl;
+	S.report(v);
+	for (int i = 0; i < m; i++) {
+		cout << v[i] << "\t";
+	}
+	cout<<endl;
+
+}
 
 
 int main() {
@@ -157,7 +213,9 @@ int main() {
 
 //	gen_sets(10, 100);
 
-	gen_array(10, 100);
+//	gen_array(10, 100);
+
+	gen_list(10, 100);
 
 	return 0;
 }
