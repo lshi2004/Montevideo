@@ -250,6 +250,8 @@ public:
 	IntSetBST(int maxelements, int maxval)
 	{
 		n = 0;
+		vn = 0;
+		v = 0;
 		this->maxelements = maxelements;
 		root = 0;
 	}
@@ -300,6 +302,158 @@ void gen_bst (int m, int maxval)
 }
 
 
+class IntSetBIN {
+
+private:
+	int n, bins, maxelements;
+	struct node {
+		int val;
+		node *next;
+		node(int v, node *p) { val = v; next = p; }
+	};
+	node **bin, *sentinel;
+	int maxval;
+
+	node *rinsert(node *p, int t)
+	{
+		if (n == maxelements) return nullptr;
+
+		if (p->val < t) {
+			p->next = rinsert(p->next, t);
+		} else {
+			p = new node(t, p);
+			n++;
+		}
+		return p;
+	}
+public:
+	IntSetBIN(int maxelements, int maxval)
+	{
+		n = 0;
+		this->maxelements = maxelements;
+		this->maxval = maxval;
+		bins = maxelements;
+		bin = new node *[bins];
+		sentinel = new node(maxval, 0);
+		for (int i = 0; i < bins; i++) {
+			bin[i] = sentinel;
+		}
+	}
+
+	int size() { return n; }
+
+	void insert(int t)
+	{
+		int i = t / (1 + maxval/bins);
+		bin[i] = rinsert(bin[i], t);
+	}
+
+	void report(int *v)
+	{
+		int j = 0;
+		for (int i = 0; i < bins; i++) {
+			for (node *p = bin[i]; p != sentinel; p = p->next) {
+				 v[j++] = p->val;
+			}
+		}
+	}
+};
+
+
+
+void gen_bin (int m, int maxval)
+{
+	int *v = new int[m];
+
+	IntSetBIN S(m, maxval);
+
+	while (S.size() < m) {
+		int k = rand() % maxval;
+		cout << "KK1 Inserted " << k << " size ";
+		cout << S.size() << endl;
+		S.insert(k);
+		S.report(v);
+		for (int i = 0; i < m; i++) {
+			cout << v[i] << "\t";
+		}
+		cout<<endl;
+
+	}
+
+	cout << "Final Printing " << v << " size " << S.size() << endl;
+	S.report(v);
+	for (int i = 0; i < m; i++) {
+		cout << v[i] << "\t";
+	}
+	cout<<endl;
+
+}
+
+
+class IntSetVEC {
+private:
+	enum { BITSPERWORD = 32, SHIFT = 5, MASK = 0x1F};
+	int n, hi, *x;
+	void set (int i) { x[i>>SHIFT] |= (1 << (i & MASK)); }
+	void clr (int i) { x[i>>SHIFT] &= ~(1 << (i & MASK)); }
+	int test(int i) { return x[i>>SHIFT] & (1 << (i & MASK)); }
+public:
+	IntSetVEC(int maxelements, int maxval)
+	{
+		hi = maxval;
+		x = new int[1 + hi/BITSPERWORD];
+		for (int i = 0; i < hi; i++)
+			clr(i);
+		n = 0;
+	}
+	int size() { return n; }
+	void insert(int t) {
+		if (test(t)) {
+			return;
+		}
+		set(t);
+		n++;
+	}
+	void report(int *v)
+	{
+		int j = 0;
+		for (int i = 0; i < hi; i++) {
+			if (test(i)) {
+				v[j++] = i;
+			}
+		}
+	}
+};
+
+
+void gen_vec (int m, int maxval)
+{
+	int *v = new int[m];
+
+	IntSetBIN S(m, maxval);
+
+	while (S.size() < m) {
+		int k = rand() % maxval;
+		cout << "KK2 Inserted " << k << " size ";
+		cout << S.size() << endl;
+		S.insert(k);
+		S.report(v);
+		for (int i = 0; i < m; i++) {
+			cout << v[i] << "\t";
+		}
+		cout<<endl;
+
+	}
+
+	cout << "Final Printing " << v << " size " << S.size() << endl;
+	S.report(v);
+	for (int i = 0; i < m; i++) {
+		cout << v[i] << "\t";
+	}
+	cout<<endl;
+
+}
+
 
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
@@ -310,7 +464,7 @@ int main() {
 
 //	gen_list(10, 100);
 
-	gen_bst(10, 200);
+	gen_vec(10, 200);
 
 	return 0;
 }
