@@ -208,6 +208,99 @@ void gen_list(int m, int maxval)
 }
 
 
+
+class IntSetBST {
+private:
+	int n, maxelements;
+	int *v, vn;
+
+	struct node {
+		int val;
+		node *left, *right;
+		node(int v) { val = v; left = right = 0; }
+	};
+
+	node *root;
+	node *rinsert(node *p, int t)
+	{
+		if (n == maxelements) return nullptr;
+
+		if (p == 0) {
+			p = new node(t);
+			n++;
+		} else if (t < p->val) {
+			p->left = rinsert(p->left, t);
+		} else if (t > p->val) {
+			p->right = rinsert(p->right, t);
+		} // do nothing if p->val == t
+
+		return p;
+	}
+
+	void traverse(node *p)
+	{
+		if (p == 0) {
+			return;
+		}
+		traverse(p->left);
+		v[vn++] = p->val;
+		traverse(p->right);
+	}
+public:
+	IntSetBST(int maxelements, int maxval)
+	{
+		n = 0;
+		this->maxelements = maxelements;
+		root = 0;
+	}
+
+	int size() { return n; }
+
+	void insert(int t)
+	{
+		root = rinsert(root, t);
+	}
+
+	void report(int *v)
+	{
+		this->v = v;
+		vn = 0;
+		traverse(root);
+	}
+};
+
+
+
+void gen_bst (int m, int maxval)
+{
+	int *v = new int[m];
+
+	IntSetBST S(m, maxval);
+
+	while (S.size() < m) {
+		int k = rand() % maxval;
+		cout << "KK Inserted " << k << " size ";
+		cout << S.size() << endl;
+		S.insert(k);
+		S.report(v);
+		for (int i = 0; i < m; i++) {
+			cout << v[i] << "\t";
+		}
+		cout<<endl;
+
+	}
+
+	cout << "Final Printing " << v << " size " << S.size() << endl;
+	S.report(v);
+	for (int i = 0; i < m; i++) {
+		cout << v[i] << "\t";
+	}
+	cout<<endl;
+
+}
+
+
+
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
@@ -215,7 +308,9 @@ int main() {
 
 //	gen_array(10, 100);
 
-	gen_list(10, 100);
+//	gen_list(10, 100);
+
+	gen_bst(10, 200);
 
 	return 0;
 }
