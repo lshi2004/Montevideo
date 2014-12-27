@@ -12,6 +12,9 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
+#include <functional>
+#include <thread>
+#include <future>
 
 using namespace std;
 
@@ -115,7 +118,7 @@ void heap_sort(T v[], int n)
 	}
 }
 
-int main()
+int t_main()
 {
 	// create empty vector for strings
 	vector<string> sentence;
@@ -161,4 +164,85 @@ int main()
 		cout << " \t " << hq[j];
 	cout << endl << endl;
 
+	return 0;
+}
+
+
+void func(int x, int y)
+{
+	cout << "Inside Func  " << x << " " << y << endl;
+}
+
+int func_int(int x, int y)
+{
+	cout << "Inside Func  " << x << " " << y << endl;
+	return 1;
+}
+
+class CC {
+public:
+	void memfunc(int x, int y) const {
+		cout << "Insde member Func " << x << " " << y << endl;
+	}
+	void operator() (int x, int y) const {
+		cout << "Insde operator Func " << x << " " << y << endl;
+	}
+};
+
+int main()
+{
+	std::vector <std::function<void(int,int)>> tasks;
+
+	auto l2 = [ ] (int x, int y) {
+		cout << "Inside lamda 1 " << x <<" "<< y << endl;
+	};
+
+	tasks.push_back(func);
+
+
+	tasks.push_back( [ ] (int x, int y)
+		{
+			cout << "Inside lamda 2 " << x << " " << y << endl;
+		}
+	);
+
+
+	tasks.push_back(l2);
+
+	for (auto f: tasks) {
+		f(33, 66);
+	}
+
+	std::function<void(const CC&, int, int)> mf;
+	mf = &CC::memfunc;
+	mf(CC(), 42, 77);
+
+
+	cout << "Callable objects" << endl << endl;
+
+	CC c;
+	// std::shared_ptr <CC> sp(new CC);
+
+	std::bind(func, 77, 33)();
+	std::bind(l2, 77, 33)();
+	std::bind(CC(), 77, 33)();
+	std::bind(&CC::memfunc, c, 77, 33)();
+	//std::bind(&CC::memfunc, sp, 77, 33)();
+
+//#if 0
+	cout << "Second Callable objects" << endl << endl;
+	auto result1= async([] { func_int( 42, 77);});
+	std::future<void> result2(std::async([&] {l2( 90, 88);}));
+
+
+	result1.wait();
+	result1.get();
+
+	result2.wait();
+	result2.get();
+
+//#endif
+
+
+	return 0;
 }
