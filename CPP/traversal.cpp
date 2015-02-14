@@ -46,6 +46,7 @@ public:
 			swap(next, current);
 		}
 
+
 		return result;
 	}
 
