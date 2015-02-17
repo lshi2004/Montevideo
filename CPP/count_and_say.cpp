@@ -10,6 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <stack>
 
 using namespace std;
 
@@ -185,6 +186,26 @@ public:
 	    }
 	    return s;
 	}
+
+	bool validParentheses(string const & s) {
+		string left = "{([";
+		string right = "}])";
+		stack<char> stk;
+
+		for (char c : s) {
+
+			if (left.find(c) != string::npos) {
+				stk.push(c);
+			} else {
+				if (stk.empty()) return false;
+				if (right.find(c) == string::npos) return false;
+				if (stk.top() != left[right.find(c)]) return false;
+				stk.pop();
+			}
+		}
+		return stk.empty();
+
+	}
 private:
 	string getNextString(const string &s) {
 		stringstream ss;
@@ -221,11 +242,14 @@ int main() {
 #endif
 
 	auto pp = new lengthSolution;
-	for (int i = 1; i < 10; i++) {
-			string s1 = pp->countAndSay(i);
+	bool k1 = pp->validParentheses("()");
+	cout << "hello" << k1 << endl;
 
-			cout << s1 << endl;
-	}
+
+//	for (int i = 1; i < 10; i++) {
+//			string s1 = pp->countAndSay(i);
+//			cout << s1 << endl;
+//	}
 
 	cout << "!!!Hello World!!! " << ptr[0] << "   " << ptr[1] << endl; // prints !!!Hello World!!!
 	return 0;
