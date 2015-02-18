@@ -42,18 +42,17 @@ public:
 
 };
 
-
 class RobotSolution {
 public:
 	int uniquePaths(int m, int n) {
-		this->f = vector<vector<int>>(m+1, vector<int>(n+1, 0));
+		this->f = vector<vector<int>>(m + 1, vector<int>(n + 1, 0));
 		return dfs(m, n);
 	}
 
 	int pathObstacles(vector<vector<int>> &grid) {
 		const int m = grid.size();
 		const int n = grid[0].size();
-		this->f = vector<vector<int>>(m+1, vector<int>(n+1, 0));
+		this->f = vector<vector<int>>(m + 1, vector<int>(n + 1, 0));
 		return dfsObstacles(m, n, grid);
 	}
 
@@ -63,20 +62,22 @@ public:
 
 		for (int i = 0; i < m; i++) {
 			for (int j = 1; j < n; j++) {
-				ff[j] = ff[j-1] + ff[j];
+				ff[j] = ff[j - 1] + ff[j];
 			}
 		}
-		return ff[n-1];
+		return ff[n - 1];
 	}
 private:
 	vector<vector<int>> f; //cache
 
 	int dfs(int x, int y) {
-		if (x < 1 || y < 1) return 0;
+		if (x < 1 || y < 1)
+			return 0;
 
-		if (x == 1 && y == 1) return 1;
+		if (x == 1 && y == 1)
+			return 1;
 
-		return getOrUpdate(x - 1, y) + getOrUpdate(x, y-1);
+		return getOrUpdate(x - 1, y) + getOrUpdate(x, y - 1);
 	}
 
 	int getOrUpdate(int x, int y) {
@@ -90,7 +91,7 @@ private:
 		if (x < 1 || y < 1)
 			return 0;
 
-		if (grid[x-1][y-1])
+		if (grid[x - 1][y - 1])
 			return 0;
 
 		if (x == 1 && y == 1)
@@ -113,8 +114,8 @@ class multipleQueens {
 public:
 	vector<vector<string>> solveQueens(int n) {
 		this->columns = vector<int>(n, 0);
-		this->mdiag = vector<int>(2*n, 0);
-		this->adiag = vector<int>(2*n, 0);
+		this->mdiag = vector<int>(2 * n, 0);
+		this->adiag = vector<int>(2 * n, 0);
 
 		vector<vector<string>> result;
 		vector<int> C(n, 0); //C[i] is the column number of queen
@@ -135,7 +136,8 @@ private:
 			for (int i = 0; i < N; ++i) {
 				string s(N, '.');
 				for (int j = 0; j < N; ++j) {
-					if (j == C[i]) s[j] = 'Q';
+					if (j == C[i])
+						s[j] = 'Q';
 				}
 				//cout << __FUNCTION__<<"   " << s<<endl;
 				solution.push_back(s);
@@ -145,32 +147,32 @@ private:
 		}
 
 		for (int j = 0; j < N; ++j) {
-			const bool ok = columns[j] == 0 && mdiag[row +j]  == 0 &&
-					adiag[row -j + N] == 0;
-			if (!ok) continue;
+			const bool ok = columns[j] == 0 && mdiag[row + j] == 0
+					&& adiag[row - j + N] == 0;
+			if (!ok)
+				continue;
 			C[row] = j;
-			columns[j] = mdiag[row +j] = adiag[row -j + N] = 1;
+			columns[j] = mdiag[row + j] = adiag[row - j + N] = 1;
 			dfs(C, result, row + 1);
-			columns[j] = mdiag[row +j] = adiag[row -j + N] = 0;
+			columns[j] = mdiag[row + j] = adiag[row - j + N] = 0;
 		}
 
 	}
 
-
 };
-
 
 class lengthSolution {
 public:
-	int lengthOfLastWord(const char *s)  {
-		if (s == nullptr) return 0;
+	int lengthOfLastWord(const char *s) {
+		if (s == nullptr)
+			return 0;
 		int len = 0;
 
 		while (*s) {
 			if (*s != ' ') {
 				len++;
 			} else {
-				if (*(s+1) && *(s+1) != ' ')
+				if (*(s + 1) && *(s + 1) != ' ')
 					len = 0;
 			}
 			s++;
@@ -179,12 +181,12 @@ public:
 	}
 
 	string countAndSay(int n) {
-	    string s("1");
+		string s("1");
 
-	    while (--n > 0)	 {
-	    	s = getNextString(s);
-	    }
-	    return s;
+		while (--n > 0) {
+			s = getNextString(s);
+		}
+		return s;
 	}
 
 	bool validParentheses(string const & s) {
@@ -197,9 +199,12 @@ public:
 			if (left.find(c) != string::npos) {
 				stk.push(c);
 			} else {
-				if (stk.empty()) return false;
-				if (right.find(c) == string::npos) return false;
-				if (stk.top() != left[right.find(c)]) return false;
+				if (stk.empty())
+					return false;
+				if (right.find(c) == string::npos)
+					return false;
+				if (stk.top() != left[right.find(c)])
+					return false;
 				stk.pop();
 			}
 		}
@@ -207,12 +212,12 @@ public:
 
 	}
 
-
-
 public:
 	int mySqrt(int n) {
-		if (n < 0) return -1;
-		if (n < 2) return n;
+		if (n < 0)
+			return -1;
+		if (n < 2)
+			return n;
 		int low, high, mid, last_mid;
 		low = 1;
 		high = n / 2;
@@ -220,7 +225,8 @@ public:
 		while (low < high) {
 			mid = low + (high - low) / 2;
 			int r = n / mid;
-			if (r == mid) return mid;
+			if (r == mid)
+				return mid;
 			else if (r < mid) {
 				high = mid - 1;
 			} else {
@@ -233,12 +239,66 @@ public:
 
 	}
 
+	bool canJump(int A[], int n) {
+
+		int reach = 1;
+
+		for (int i = 0; i < reach && reach < n; ++i) {
+			reach = max(reach, i + 1 + A[i]);
+		}
+
+		return reach >= n;
+	}
+
+	bool canJump2(int A[], int n) {
+		if (n == 0)
+			return true;
+		int left_most = n - 1;
+
+		for (int i = n - 2; i >= 0; i--) {
+			if (i + A[i] >= left_most)
+				left_most = i;
+		}
+
+		return left_most == 0;
+	}
+
+	bool canJump3(int A[], int n) {
+		vector<int> f(n, 0);
+		f[0] = 0;
+		for (int i = 1; i < n; i++) {
+			f[i] = max(f[i - 1], A[i - 1]) - 1;
+			if (f[i] < 0)
+				return false;;
+		}
+		return f[n - 1] >= 0;
+	}
+
+	int lengthOfLongestSubstring(string s) {
+		const int ASCII_MAX = 256;
+		int last[ASCII_MAX];
+		int start = 0;
+
+		fill(last, last + ASCII_MAX, -1);
+		int max_len = 0;
+
+		for (int i = 0; i < s.size(); i++) {
+			int index = s[i];
+			if (last[index] >= start) {
+				max_len = max(max_len, i - start);
+				start = last[index] + 1;
+			}
+			last[index] = i;
+		}
+
+		return max(max_len, (int)(s.size() - start));
+	}
 
 private:
 	string getNextString(const string &s) {
 		stringstream ss;
 
-		for (auto i = s.begin(); i != s.end(); ) {
+		for (auto i = s.begin(); i != s.end();) {
 			auto j = find_if(i, s.end(), bind1st(not_equal_to<char>(), *i));
 			ss << distance(i, j) << *i;
 			i = j;
@@ -247,7 +307,6 @@ private:
 	}
 
 };
-
 
 int main() {
 	int *ptr = new int[10];
@@ -260,11 +319,11 @@ int main() {
 	auto q = new multipleQueens;
 	vector<vector<string>> result = q->solveQueens(4);
 
-	for (auto i : result)  {
+	for (auto i : result) {
 		for (auto j: i) {
 			cout << j << " \t";
 		}
-		cout << endl <<endl  <<endl;
+		cout << endl <<endl <<endl;
 	}
 
 #endif
@@ -272,7 +331,6 @@ int main() {
 	auto pp = new lengthSolution;
 	bool k1 = pp->validParentheses("()");
 	cout << "hello" << k1 << endl;
-
 
 //	for (int i = 1; i < 10; i++) {
 //			string s1 = pp->countAndSay(i);
