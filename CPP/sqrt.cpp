@@ -37,7 +37,6 @@ public:
 
 	int removeDuplicates_new(int A[], int n) {
 		return distance(A, unique(A, A + n));
-
 	}
 
 };
