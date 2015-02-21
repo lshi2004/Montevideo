@@ -69,8 +69,8 @@ public:
 	ListNode *reverse(ListNode *head) {
 		if (!head) return nullptr;
 
-		ListNode *prev = head;
-		ListNode *cur = head->next;
+		ListNode *prev = nullptr;
+		ListNode *cur = head;
 		while (cur) {
 			ListNode *tmp = cur->next;
 			cur->next = prev;
