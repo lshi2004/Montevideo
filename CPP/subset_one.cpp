@@ -109,6 +109,7 @@ public:
 	}
 
 public:
+#if 0
 	vector<vector<int>> subsets(vector<int> &S) {
 		sort(S.begin(), S.end());
 		vector<vector<int>> result;
@@ -131,6 +132,31 @@ public:
 		subsets(S, path, step + 1, result);
 		cout << "should pop but not"<< endl;
 		path.pop_back();
+	}
+#endif
+	vector<vector<int>> subsets(vector<int> &S) {
+		sort(S.begin(), S.end());
+		vector<vector<int>> result;
+		vector<bool> selected(S.size(), false);
+
+		subsets(S, selected, 0, result);
+		return result;
+	}
+
+	void subsets(const vector<int> &S, vector<bool> &selected, int step,
+				 vector<vector<int>> &result) {
+		if (step == S.size()) {
+			vector<int> subset;
+			for (int i = 0; i < S.size(); i++) {
+				if (selected[i]) subset.push_back(S[i]);
+			}
+			result.push_back(subset);
+			return;
+		}
+		selected[step] = false;
+		subsets(S, selected, step + 1, result);
+		selected[step] = true;
+		subsets(S, selected, step + 1, result);
 	}
 
 
