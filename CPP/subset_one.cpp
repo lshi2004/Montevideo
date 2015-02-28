@@ -159,7 +159,20 @@ public:
 		subsets(S, selected, step + 1, result);
 	}
 
+	vector<vector<int> > subsets_iterative(vector<int> &S) {
+		sort(S.begin(), S.end());
+		vector<vector<int>> result(1);
 
+		for (auto elem: S) {
+			result.reserve(result.size() * 2);
+			auto half = result.begin() + result.size();
+			copy(result.begin(), half, back_inserter(result));
+			for_each(half, result.end(), [&elem](decltype(result[0]) &e) {
+				e.push_back(elem);
+			});
+		}
+		return result;
+	}
 };
 
 void printPreOrder(TreeNode *root) {
