@@ -112,6 +112,7 @@ public:
 
 public:
 	double pow(double x, int n) {
+
 		if (n < 0) {
 			if (n == INT_MIN)
 				return 1.0;
@@ -178,7 +179,7 @@ int main() {
 
 	int kk = INT_MIN;
 	cout << "the integer min is " << kk << endl;
-	cout << "the integer reversed is " << -kk << endl;
+	cout << "the integer reversed is " << abs(kk) << endl;
 
 	kk = INT_MAX;
 	cout << "the integer max is " << kk << endl;
