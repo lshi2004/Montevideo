@@ -124,7 +124,21 @@ public:
 			 return;
 		 }
 		 generate(n, s + '(', l + 1, r, result);
-		 if (l > r) generate(n, s + '(', l, r + 1, result);
+		 if (l > r) generate(n, s + ')', l, r + 1, result);
+	 }
+
+	 vector<string> generateParenthesis2 (int n) {
+		 if (n == 0) return vector<string>(1, "");
+		 if (n == 1) return vector<string>(1, "()");
+		 vector<string> result;
+
+		 for (int i = 0; i  < n; i++) {
+			 for (auto inner : generateParenthesis2(i))
+				 for (auto outer: generateParenthesis2(n - i - 1))
+					 result.push_back("(" + inner + ")" + outer);
+		 }
+
+		 return result;
 	 }
 
 };
