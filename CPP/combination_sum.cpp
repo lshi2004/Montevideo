@@ -111,31 +111,52 @@ public:
 	}
 
 public:
-	 vector<vector<int> > combinationSum(vector<int> &candidates, int target) {
-	        sort(candidates.begin(), candidates.end());
-			vector<vector<int> > result;
-			vector<int> intermediate;
-			dfs(candidates, target, 0, intermediate, result);
-			return result;
+	vector<vector<int> > combinationSum(vector<int> &nums, int target) {
+		sort(nums.begin(), nums.end());
+		vector<vector<int> > result;
+		vector<int> intermediate;
+		dfs(nums, target, 0, intermediate, result);
+		return result;
+	}
+private:
+	void dfs1(vector<int>& nums, int gap, int start, vector<int>& intermediate,
+			vector<vector<int> > &result) {
+		if (gap == 0) {
+			result.push_back(intermediate);
+			return;
 		}
-	private:
-		void dfs(vector<int>& nums, int gap, int start, vector<int>& intermediate,
-				vector<vector<int> > &result) {
-			if (gap == 0) {
-				result.push_back(intermediate);
+		for (size_t i = start; i < nums.size(); i++) {
+
+			if (gap < nums[i])
 				return;
-			}
-			for (size_t i = start; i < nums.size(); i++) {
 
-				if (gap < nums[i])
-					return;
+			intermediate.push_back(nums[i]);
+			dfs(nums, gap - nums[i], i, intermediate, result);
+			intermediate.pop_back();
+		}
+	}
 
-				intermediate.push_back(nums[i]);
-				dfs(nums, gap - nums[i], i, intermediate, result);
-				intermediate.pop_back();
-			}
+	void dfs(vector<int>& nums, int gap, int start, vector<int>& intermediate,
+			vector<vector<int> > &result) {
+		if (start >= nums.size())
+			return;
 
-	    }
+		if (gap == 0) {
+			result.push_back(intermediate);
+			return;
+		}
+
+		// no selecting it
+		dfs(nums, gap, start + 1, intermediate, result);
+
+		if (gap < nums[start])
+			return;
+		//selecting it
+		intermediate.push_back(nums[start]);
+		dfs(nums, gap - nums[start], start, intermediate, result);
+		intermediate.pop_back();
+
+	}
 };
 
 void printPreOrder(TreeNode *root) {
