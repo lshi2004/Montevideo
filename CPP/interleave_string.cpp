@@ -131,7 +131,29 @@ public:
 	}
 
 public:
+	bool isInterleave(string s1, string s2, string s3) {
+        int n1 = s1.length();
+		int n2 = s2.length();
+		int n3 = s3.length();
 
+		if (n3 != n1 + n2) return false;
+
+		vector<vector<bool>> f(s1.length() + 1, vector<bool>
+					(s2.length() + 1, true));
+
+		for (size_t i = 1; i <= n1; i++)
+			f[i][0] = f[i - 1][0] && s1[i - 1] == s3[i - 1];
+
+		for (size_t i = 1; i <= n2; i++)
+			f[0][i] = f[0][i-1] && s2[i -1 ] == s3[i - 1];
+
+		for (size_t i = 1; i <= n1; i++)
+			for (size_t j = 1; j <= n2; j++)
+				f[i][j] = (s1[i-1] == s3[i+j-1] && f[i-1][j])
+					|| (s2[j-1] == s3[i+j-1] && f[i][j-1]);
+
+		return f[n1][n2];
+	}
 };
 
 void printPreOrder(TreeNode *root) {
@@ -214,34 +236,3 @@ int main() {
 
 	return 0;
 }
-
-#if 0
-
-1. Requirement details/timeline
-
-
-The use case is IWAN support for SGT for the following technologies:
-PfRv3 policies
-Performance Monitor policies
-QoS policies
-
-The requirement is that SGT name be used in the configuration of SGT support in the policies.
-
- 2. Technical Details
-Make two APIs public to do SGT name and ID mapping.
-When mapping changes, notification is needed.
-
-the support of SG table download on S/T, esp. public API to map between SG name and tag. Are below the right ones? If yes, we need to make them public and have reg_invoke version for them since caller may not be built into all the same image set as CTS does.
-char * cts_get_sgname_from_sgt (cts_sgt_tag_t sgt);
-boolean cts_get_sgt_from_sgname (const char *sg_name_p, cts_sgt_t *sgt_p);
-
-3. Setup info and configuration guide for ISE with CTS.
-Any IOU (e.g. Standalone set up to test aaa download of SG table). I see there are commands “test cts aaa sg-table/sg-info”, but it seems we need some special procedures to get it working — trying on standalone device does not work.
-
-
--- Do not delete or change any of the text below this line --
-
-WebEx information for your meeting scheduled on cisco.webex.com will be in this section after you save and send this invitation.
-To preview the WebEx information, save the meeting.
-
-#endif
