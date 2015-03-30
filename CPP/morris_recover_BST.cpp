@@ -89,7 +89,6 @@ struct Point {
 	}
 };
 
-
 class LRUCache {
 private:
 	struct CacheNode {
@@ -144,12 +143,9 @@ public:
 #if 0
 	// time exceeded ...
 
-
 private:
-    typedef string::const_iterator Iterator;
-    map<tuple<Iterator, Iterator, Iterator>, bool> cache;
-
-
+	typedef string::const_iterator Iterator;
+	map<tuple<Iterator, Iterator, Iterator>, bool> cache;
 
 public:
 
@@ -166,10 +162,10 @@ public:
 
 		for (int i = 1; i < length; ++i) {
 			if (( getOrUpdate(first1, first1 + i, first2)
-					&& getOrUpdate(first1 + i, last1, first2 + i))
+							&& getOrUpdate(first1 + i, last1, first2 + i))
 					|| (getOrUpdate(first1, first1 + i, last2 - i)
-						&& getOrUpdate(first1 + i, last1, first2)) )
-				return true;
+							&& getOrUpdate(first1 + i, last1, first2)) )
+			return true;
 		}
 
 		return false;
@@ -180,19 +176,14 @@ public:
 		auto pos = cache.find(key);
 
 		if (pos != cache.end())
-			return pos->second;
+		return pos->second;
 
 		cache[key] = isScramble(first1, last1, first2);
 
 		return cache[key];
 	}
 
-
 #endif
-
-
-
-
 
 private:
 
@@ -215,6 +206,7 @@ private:
 				if (node->right == nullptr) {
 					result.push_back(cur->val);
 					node->right = cur;
+					prev = cur;
 					cur = cur->left;
 				} else {
 					node->right = nullptr;
@@ -226,51 +218,82 @@ private:
 		return result;
 	}
 
+	vector<int> inorderTraversal(TreeNode *root) {
+		vector<int> result;
+		TreeNode *cur, *prev;
 
+		cur = root;
+		while (cur != nullptr) {
+			if (cur->left == nullptr) {
+				result.push_back(cur->val);
+				prev = cur;
+				cur = cur->right;
+			} else {
+				// look for pre-node
+				TreeNode *node = cur->left;
+				while (node->right != nullptr && node->right != cur)
+					node = node->right;
 
+				if (node->right == nullptr) {
 
-	 void recoverTree(TreeNode *root) {
+					node->right = cur;
+					//prev = cur;
+					cur = cur->left;
+				} else {
+					result.push_back(cur->val);
+					node->right = nullptr;
+					prev = cur;
+					cur = cur->right;
+				}
+			}
+		}
 
-		 pair<TreeNode*, TreeNode*> broken;
-	     TreeNode* prev = nullptr;
-	     TreeNode* cur = root;
+		return result;
 
-	     while (cur != nullptr) {
-	    	 if (cur->left == nullptr) {
-	    		 detect(broken, prev, cur);
-	    		 prev = cur;
-	    		 cur = cur->right;
-	    	 } else {
-	    		 auto node = cur->left;
-	    		 while (node->right != nullptr && node->right != cur)
-	    			 node = node->right;
+	}
 
-	    		 if (node->right == nullptr) {
-	    			 node->right = cur;
-	    			 cur = cur->left;
-	    		 } else {
-	    			 detect(broken, prev, cur);
-	    			 node->right = nullptr;
-	    			 prev = cur;
-	    			 cur = cur->right;
-	    		 }
-	    	 }
+	void recoverTree(TreeNode *root) {
 
-	     }
+		pair<TreeNode*, TreeNode*> broken;
+		TreeNode* prev = nullptr;
+		TreeNode* cur = root;
 
-	     swap(broken.first->val, broken.second->val);
-	 }
+		while (cur != nullptr) {
+			if (cur->left == nullptr) {
+				detect(broken, prev, cur);
+				prev = cur;
+				cur = cur->right;
+			} else {
+				auto node = cur->left;
+				while (node->right != nullptr && node->right != cur)
+					node = node->right;
 
-	 void detect(pair<TreeNode*, TreeNode*>& broken, TreeNode* prev, TreeNode* cur)
-	 {
-		 if (prev != nullptr && prev->val > cur->val) {
-			 if (broken.first == nullptr) {
-				 broken.first = prev;
-			 }
-			 broken.second = cur;
-		 }
+				if (node->right == nullptr) {
+					node->right = cur;
+					cur = cur->left;
+				} else {
+					detect(broken, prev, cur);
+					node->right = nullptr;
+					prev = cur;
+					cur = cur->right;
+				}
+			}
 
-	 }
+		}
+
+		swap(broken.first->val, broken.second->val);
+	}
+
+	void detect(pair<TreeNode*, TreeNode*>& broken, TreeNode* prev,
+			TreeNode* cur) {
+		if (prev != nullptr && prev->val > cur->val) {
+			if (broken.first == nullptr) {
+				broken.first = prev;
+			}
+			broken.second = cur;
+		}
+
+	}
 
 };
 
