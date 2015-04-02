@@ -141,33 +141,28 @@ public:
 
 public:
 
-	string getPermutation(int n, int k) {
-		vector<int> nums(n);
-		int permCount = 1;
+	vector<vector<int> > permute(vector<int> &num) {
+		vector<vector<int>> result;
 
-		for (int i = 0; i < n; i++) {
-			nums[i] = i + 1;
-			permCount *= (i + 1);
-		}
+		if (num.size() == 0) return result;
+		permute_all(num, result, num.size() - 1, 0);
 
-		k--;
-		string targetNum;
-		for (int i = 0; i < n; i++) {
-			permCount = permCount / (n - i);
-			int choosed = k / permCount;
-			targetNum.push_back(nums[choosed] + '0');
-
-			for (int j = choosed; j < n - i; j++)
-				nums[j] = nums[j + 1];
-
-			k = k % permCount;
-		}
-
-		return targetNum;
-
+		return result;
 	}
 
+	void permute_all(vector<int> &num, vector<vector<int>> &result,
+					 int n, int k) {
+		if (k == n) {
+			result.push_back(num);
+		} else {
+			for (int i = k; i <= n; i++) {
+				swap(num[i], num[k]);
+				permute_all(num, result, n, k + 1);
+				swap(num[i], num[k]);
+			}
+		}
 
+	}
 
 };
 
