@@ -1,0 +1,5 @@
+     curl -H "Content-Type: application/json" -X POST  -d @../dc_example1.json http://localhost:8080/dcontrollers
+     curl -H "Content-Type: application/json" -X POST  -d @../dc_example2.json http://localhost:8080/dcontrollers
+     curl -H "Content-Type: application/json" -X POST  -d @../policy_example1.json http://localhost:8080/policies
+
+
