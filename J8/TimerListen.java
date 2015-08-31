@@ -1,19 +1,22 @@
 package com.montevideo.cisco.tutorial;
 
 import java.io.IOException;
-
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeoutException;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.ConsumerCancelledException;
+import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.AMQP;
+
 import com.rabbitmq.client.ShutdownSignalException;
 
 class DCNMListenThread extends Thread {
@@ -30,8 +33,7 @@ class DCNMListenThread extends Thread {
 
 	public static void listenDCNMNotification() {
 		ConnectionFactory factory = new ConnectionFactory();
-		QueueingConsumer consumer = null;
-
+		
 		System.out.println(" DCNM [*] Waiting for messages " + DCNMHOST
 				+ " To exit press CTRL+C");
 
@@ -39,56 +41,56 @@ class DCNMListenThread extends Thread {
 		factory.setUsername("admin");
 		factory.setPassword("cisco123");
 
-		Connection connection;
+		
 		try {
-			connection = factory.newConnection();
+			Connection connection = factory.newConnection();
 			Channel channel = connection.createChannel();
 
 			String queueName = channel.queueDeclare().getQueue();
 			channel.queueBind(queueName, DCNMEXCHANGENAME, "#");
 
-			consumer = new QueueingConsumer(channel);
+			// consumer = new QueueingConsumer(channel);
+			// channel.basicConsume(queueName, true, consumer);
+
+			Consumer consumer = new DefaultConsumer(channel) {
+				@Override
+				public void handleDelivery(String consumerTag,
+						Envelope envelope, AMQP.BasicProperties properties,
+						byte[] body) throws IOException {
+
+					System.out.println("Get a message   " + numDCNMMessages);
+					numDCNMMessages++;
+					String message = new String(body, "UTF-8");
+					System.out.println(" [x] Received '"
+							+ envelope.getRoutingKey() + "':'" + message + "'"+ "' from "
+							+ Thread.currentThread().getName());
+							
+
+					String pattern = "(\\w+)\\.(\\w+)\\.(\\w+)";
+
+					// Create a Pattern object
+					Pattern r = Pattern.compile(pattern);
+
+					// Now create matcher object.
+					Matcher m = r.matcher(envelope.getRoutingKey());
+
+					if (m.find()) {
+						System.out.println("Found value: " + m.group(0));
+						System.out.println("Found value: " + m.group(1));
+						System.out.println("Found value: " + m.group(2));
+					} else {
+						System.out.println("NO MATCH");
+					}
+				}
+			};
 			channel.basicConsume(queueName, true, consumer);
+
 		} catch (IOException | java.util.concurrent.TimeoutException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		while (true) {
-			System.out.println("Get a message   " + numDCNMMessages);
-			numDCNMMessages++;
-
-			QueueingConsumer.Delivery delivery = null;
-			try {
-				delivery = consumer.nextDelivery();
-			} catch (ShutdownSignalException | ConsumerCancelledException
-					| InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			String message = new String(delivery.getBody());
-			String routingKey = delivery.getEnvelope().getRoutingKey();
-
-			System.out.println(" [x] Received '" + routingKey + "':'" + message
-					+ "' from " + Thread.currentThread().getName());
-
-			String pattern = "(\\w+)\\.(\\w+)\\.(\\w+)";
-
-			// Create a Pattern object
-			Pattern r = Pattern.compile(pattern);
-
-			// Now create matcher object.
-			Matcher m = r.matcher(routingKey);
-
-			if (m.find()) {
-				System.out.println("Found value: " + m.group(0));
-				System.out.println("Found value: " + m.group(1));
-				System.out.println("Found value: " + m.group(2));
-			} else {
-				System.out.println("NO MATCH");
-			}
-
-		}
+	
 	}
 
 }
@@ -100,7 +102,7 @@ class OpenStackListenThread extends Thread {
 	static int numStackMessages = 0;
 
 	public void run() {
-		System.out.println("Hello from Stack thread!");
+		System.out.println("Hello from OpenStack thread!");
 		listenStackNotification();
 
 	}
@@ -177,7 +179,7 @@ class GPENotificationThread extends Thread {
 	private static final String EXCHANGE_HOST = "localhost";
 
 	public void run() {
-		System.out.println("Hello from Stack thread!");
+		System.out.println("Hello from GPENotificationThread!");
 		try {
 			sendGPENotification();
 		} catch (IOException | TimeoutException | InterruptedException e) {
@@ -196,27 +198,26 @@ class GPENotificationThread extends Thread {
 
 		channel.exchangeDeclare(EXCHANGE_NAME, "topic");
 
-		
-		// Policy Creation Events 
+		// Policy Creation Events
 		Timer timerPolicyEvent = new Timer();
 		timerPolicyEvent.schedule(new TimerTask() {
-			int messageCount = 1; 
-			
+			int messageCount = 1;
+
 			@Override
 			public void run() {
-				
+
 				// TODO Auto-generated method stub
 				System.out.println("Policy Create Event being Sent");
 
 				String routingKey = "success.com.cisco.cdpe.policy";
-				
+
 				String message = " Policy Created messageCount " + messageCount;
-				messageCount++; 
-				
-				if (messageCount % 2 == 0) { 
-					message += "Creation"; 
-				} else { 
-					message += "Deletion"; 
+				messageCount++;
+
+				if (messageCount % 2 == 0) {
+					message += "  Creation";
+				} else {
+					message += "  Deletion";
 				}
 
 				try {
@@ -233,27 +234,26 @@ class GPENotificationThread extends Thread {
 
 		}, 100, 7000);
 
-		
-		// Policy Creation Events 
+		// Policy Creation Events
 		Timer timerGroupEvent = new Timer();
 		timerGroupEvent.schedule(new TimerTask() {
-			int messageCount = 1; 
-			
+			int messageCount = 1;
+
 			@Override
 			public void run() {
-				
+
 				// TODO Auto-generated method stub
 				System.out.println("Group Create Event being Sent");
 
 				String routingKey = "success.com.cisco.cdpe.group";
-				
+
 				String message = " Group Created messageCount " + messageCount;
-				messageCount++; 
-				
-				if (messageCount % 2 == 0) { 
-					message += "Creation"; 
-				} else { 
-					message += "Deletion"; 
+				messageCount++;
+
+				if (messageCount % 2 == 0) {
+					message += "  Creation";
+				} else {
+					message += "  Deletion";
 				}
 
 				try {
@@ -270,9 +270,6 @@ class GPENotificationThread extends Thread {
 
 		}, 100, 3000);
 
-		
-		
-		
 	}
 
 }
@@ -287,20 +284,21 @@ public class App {
 			IOException, TimeoutException,
 			java.util.concurrent.TimeoutException {
 
-		// DCNMListenThread dcnm = new DCNMListenThread();
-		// dcnm.run();
+		//GPENotificationThread gpeNotify = new GPENotificationThread();
+		//gpeNotify.run();
 
-		// OpenStackListenThread openStack = new OpenStackListenThread();
-		// openStack.run();
+		System.out.println("Getting into next round of fun ");
 
-		GPENotificationThread gpeNotify = new GPENotificationThread();
-		gpeNotify.run();
+		DCNMListenThread dcnm = new DCNMListenThread();
+		dcnm.run();
+
+		//OpenStackListenThread openStack = new OpenStackListenThread();
+		//openStack.run();
 
 		while (true) {
 			Thread.sleep(1000);
 		}
-		
-		
+
 		// connection.close();
 
 	}
